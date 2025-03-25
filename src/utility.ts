@@ -29,3 +29,8 @@ export function getRandomLocationAtDistance(lat: number, lon: number, distance: 
 		longitude: lon2 * 180 / Math.PI,
 	};
 }
+
+export function getRandomLocationInRange(lat: number, lon: number, minDistance: number, maxDistance: number): { latitude: number, longitude: number } {
+	const distance = Math.random() * (maxDistance - minDistance) + minDistance;
+	return getRandomLocationAtDistance(lat, lon, distance);
+}

@@ -5,7 +5,7 @@ import L from 'leaflet';
 
 import icon from './assets/placeholder-marker.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { getRandomLocationAtDistance } from "./utility";
+import { getRandomLocationInRange } from "./utility";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -18,13 +18,15 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const randomLocationCount = 50;
-const randomLocationDistance = 300; //in meters
+const randomLocationCount = 3;
+const randomLocationDistance = 275; //in meters
+const randomLocationRange = 25; //in meters
 
 function App() {
   const previousLocation = useRef<{ latitude: number, longitude: number } | null>(null);
   const [location, setLocation] = useState<{ latitude: number, longitude: number } | null>(null);
   const [randomLocations, setRandomLocations] = useState<{ latitude: number, longitude: number }[]>([]);
+  const [refreshLocations, setRefreshLocations] = useState(false);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -32,17 +34,29 @@ function App() {
       console.log('Geolocation is not supported by your browser');
     }
 
-    const locateInterval = setInterval(() => {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+    const calculatePosition = () => {
+      return new Promise<void>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition((position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          resolve();
+        }, (err) => {
+          setLocation(null);
+          console.log('Unable to retrieve your location', err);
+          reject(err);
         });
-      }, (err) => {
-        setLocation(null);
-        console.log('Unable to retrieve your location', err);
       });
+    }
+
+    const locateInterval = setInterval(() => {
+      calculatePosition();
     }, 1000);
+
+    calculatePosition().then(() => {
+      setRefreshLocations(true);
+    });
 
     return () => {
       clearInterval(locateInterval);
@@ -50,29 +64,24 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!location) {
-      return;
-    }
-
-    if (previousLocation.current &&
-      previousLocation.current.latitude === location.latitude &&
-      previousLocation.current.longitude === location.longitude
-    ) {
+    if (!location || !refreshLocations) {
       return;
     }
 
     previousLocation.current = location;
+    setRefreshLocations(false);
 
     const newRandomLocations = [];
 
     for (let i = 0; i < randomLocationCount; i++) {
       newRandomLocations.push(
-        getRandomLocationAtDistance(location.latitude, location.longitude, randomLocationDistance)
+        getRandomLocationInRange(location.latitude, location.longitude,
+          randomLocationDistance - randomLocationRange, randomLocationDistance + randomLocationRange)
       );
     }
 
     setRandomLocations(newRandomLocations);
-  }, [location]);
+  }, [refreshLocations]);
 
   return (
     <div>
@@ -82,7 +91,7 @@ function App() {
           <p>
             Latitude: {location.latitude}, Longitude: {location.longitude}
           </p>
-
+          <button onClick={() => setRefreshLocations(true)}>Get new locations</button>
           <div>
             <MapContainer
               center={[location.latitude, location.longitude]}
@@ -112,8 +121,9 @@ function App() {
         <p>Loading
           <span>...</span>
         </p>
-      )}
-    </div>
+      )
+      }
+    </div >
   )
 }
 
