@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import './mapStyleCopy.css';
 import L from 'leaflet';
 
 import icon from './assets/placeholder-marker.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { getRandomLocationInRange } from "./utility";
+import { calculateDistance, getRandomLocationInRange } from "./utility";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -22,8 +22,9 @@ const randomLocationCount = 3;
 const randomLocationDistance = 275; //in meters
 const randomLocationRange = 25; //in meters
 
+const inRangeDistance = 50; //in meters
+
 function App() {
-  const previousLocation = useRef<{ latitude: number, longitude: number } | null>(null);
   const [location, setLocation] = useState<{ latitude: number, longitude: number } | null>(null);
   const [randomLocations, setRandomLocations] = useState<{ latitude: number, longitude: number }[]>([]);
   const [refreshLocations, setRefreshLocations] = useState(false);
@@ -68,7 +69,6 @@ function App() {
       return;
     }
 
-    previousLocation.current = location;
     setRefreshLocations(false);
 
     const newRandomLocations = [];
@@ -82,6 +82,22 @@ function App() {
 
     setRandomLocations(newRandomLocations);
   }, [refreshLocations]);
+
+  useEffect(() => {
+    if (!location) {
+      return;
+    }
+
+    randomLocations.forEach((randomLocation) => {
+      const distance = calculateDistance(location.latitude, location.longitude,
+        randomLocation.latitude, randomLocation.longitude);
+
+      if (distance <= inRangeDistance) {
+        setRefreshLocations(true);
+      };
+    });
+
+  }, [location]);
 
   return (
     <div>
