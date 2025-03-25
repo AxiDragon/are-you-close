@@ -5,6 +5,7 @@ import L from 'leaflet';
 
 import icon from './assets/placeholder-marker.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { getRandomLocationAtDistance } from "./utility";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -17,7 +18,8 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const randomLocationCount = 3;
+const randomLocationCount = 50;
+const randomLocationDistance = 300; //in meters
 
 function App() {
   const previousLocation = useRef<{ latitude: number, longitude: number } | null>(null);
@@ -64,10 +66,9 @@ function App() {
     const newRandomLocations = [];
 
     for (let i = 0; i < randomLocationCount; i++) {
-      newRandomLocations.push({
-        latitude: location.latitude + (Math.random() * 0.1) - 0.05,
-        longitude: location.longitude + (Math.random() * 0.1) - 0.05,
-      });
+      newRandomLocations.push(
+        getRandomLocationAtDistance(location.latitude, location.longitude, randomLocationDistance)
+      );
     }
 
     setRandomLocations(newRandomLocations);
