@@ -13,7 +13,8 @@ const DefaultIcon = L.icon({
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
-  shadowSize: [41, 41],
+  shadowSize: [32, 32],
+  shadowAnchor: [8, 32]
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -111,7 +112,7 @@ function App() {
           <div>
             <MapContainer
               center={[location.latitude, location.longitude]}
-              zoom={13}
+              zoom={16}
               style={{ height: '80vh', width: '100%' }}
             >
               <TileLayer
@@ -121,13 +122,13 @@ function App() {
               {randomLocations.map((location, i) => (
                 <Marker key={i} position={[location.latitude, location.longitude]} >
                   <Popup>
-                    whatsup gamer, this is location {i}
+                    Location {i + 1}
                   </Popup>
                 </Marker>
               ))}
               <Marker position={[location.latitude, location.longitude]} >
                 <Popup>
-                  whatsup gamer
+                  You're here!
                 </Popup>
               </Marker>
             </MapContainer>
