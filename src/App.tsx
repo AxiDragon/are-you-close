@@ -6,7 +6,10 @@ import L from 'leaflet';
 import ownMarker from './assets/own-marker.png';
 import randomMarker from './assets/random-marker.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import placeholder from './assets/square-placeholder.jpg';
+
 import { calculateDistance, getRandomLocationInRange } from "./utility";
+import ImageWithPreservedAspect from "./ImageWithPreservedAspect";
 
 const DefaultIcon = L.icon({
   iconUrl: randomMarker,
@@ -130,6 +133,7 @@ function App() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <ImageWithPreservedAspect imageUrl={placeholder} location={location} ratio={0.3} />
               {randomLocations.map((randomLocation, i) => (
                 <Fragment key={i}>
                   <Polyline positions={[
