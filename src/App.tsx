@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
-import { MapContainer, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
+import { Circle, MapContainer, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
 import './mapStyleCopy.css';
 import L from 'leaflet';
 
@@ -23,7 +23,7 @@ const randomLocationCount = 3;
 const randomLocationDistance = 275; //in meters
 const randomLocationRange = 25; //in meters
 
-const inRangeDistance = 50; //in meters
+const inRangeDistance = 75; //in meters
 
 function App() {
   const [location, setLocation] = useState<{ latitude: number, longitude: number } | null>(null);
@@ -126,6 +126,7 @@ function App() {
                     [randomLocation.latitude, randomLocation.longitude]
                   ]}
                     color="orange" />
+                  <Circle center={[randomLocation.latitude, randomLocation.longitude]} radius={inRangeDistance} color="orange" />
                   <Marker position={[randomLocation.latitude, randomLocation.longitude]} >
                     <Popup>
                       Location {i + 1}
