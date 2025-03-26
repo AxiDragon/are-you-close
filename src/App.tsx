@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { Fragment, useEffect, useState } from "react"
+import { MapContainer, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
 import './mapStyleCopy.css';
 import L from 'leaflet';
 
@@ -119,12 +119,19 @@ function App() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {randomLocations.map((location, i) => (
-                <Marker key={i} position={[location.latitude, location.longitude]} >
-                  <Popup>
-                    Location {i + 1}
-                  </Popup>
-                </Marker>
+              {randomLocations.map((randomLocation, i) => (
+                <Fragment key={i}>
+                  <Polyline positions={[
+                    [location.latitude, location.longitude],
+                    [randomLocation.latitude, randomLocation.longitude]
+                  ]}
+                    color="orange" />
+                  <Marker position={[randomLocation.latitude, randomLocation.longitude]} >
+                    <Popup>
+                      Location {i + 1}
+                    </Popup>
+                  </Marker>
+                </Fragment>
               ))}
               <Marker position={[location.latitude, location.longitude]} >
                 <Popup>
