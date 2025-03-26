@@ -3,18 +3,24 @@ import { Circle, MapContainer, Marker, Polyline, Popup, TileLayer } from "react-
 import './mapStyleCopy.css';
 import L from 'leaflet';
 
-import icon from './assets/placeholder-marker.png';
+import ownMarker from './assets/own-marker.png';
+import randomMarker from './assets/random-marker.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { calculateDistance, getRandomLocationInRange } from "./utility";
 
 const DefaultIcon = L.icon({
-  iconUrl: icon,
+  iconUrl: randomMarker,
   shadowUrl: iconShadow,
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
   shadowSize: [32, 32],
   shadowAnchor: [8, 32]
+});
+
+const OwnIcon = L.icon({
+  ...DefaultIcon.options,
+  iconUrl: ownMarker,
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -101,8 +107,13 @@ function App() {
   }, [location]);
 
   return (
-    <div>
-      <h1>Geolocation</h1>
+    <div style={{
+      fontFamily: 'Arial, sans-serif',
+    }}>
+      <h1>Are You Close?</h1>
+      <p>
+        Approach one of the random locations to get new locations, or press the button down below.
+      </p>
       {location ? (
         <>
           <p>
@@ -134,7 +145,7 @@ function App() {
                   </Marker>
                 </Fragment>
               ))}
-              <Marker position={[location.latitude, location.longitude]} >
+              <Marker position={[location.latitude, location.longitude]} icon={OwnIcon}>
                 <Popup>
                   You're here!
                 </Popup>
