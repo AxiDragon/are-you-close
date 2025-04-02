@@ -10,6 +10,7 @@ import placeholder from './assets/square-placeholder.jpg';
 
 import { calculateDistance, getRandomLocationInRange } from "./utility";
 import ImageWithPreservedAspect from "./ImageWithPreservedAspect";
+import { useControlledLocation, useGeolocation } from "./Locater";
 
 const DefaultIcon = L.icon({
   iconUrl: randomMarker,
@@ -34,45 +35,10 @@ const randomLocationRange = 25; //in meters
 
 const inRangeDistance = 75; //in meters
 
-function App() {
-  const [location, setLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+function App({ useControls = false }: { useControls?: boolean }) {
+  const location = useControls ? useControlledLocation(5) : useGeolocation();
   const [randomLocations, setRandomLocations] = useState<{ latitude: number, longitude: number }[]>([]);
   const [refreshLocations, setRefreshLocations] = useState(false);
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setLocation(null);
-      console.log('Geolocation is not supported by your browser');
-    }
-
-    const calculatePosition = () => {
-      return new Promise<void>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition((position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          resolve();
-        }, (err) => {
-          setLocation(null);
-          console.log('Unable to retrieve your location', err);
-          reject(err);
-        });
-      });
-    }
-
-    const locateInterval = setInterval(() => {
-      calculatePosition();
-    }, 1000);
-
-    calculatePosition().then(() => {
-      setRefreshLocations(true);
-    });
-
-    return () => {
-      clearInterval(locateInterval);
-    };
-  }, []);
 
   useEffect(() => {
     if (!location || !refreshLocations) {
@@ -133,7 +99,7 @@ function App() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <ImageWithPreservedAspect imageUrl={placeholder} location={location} ratio={0.3} />
+              {/* <ImageWithPreservedAspect imageUrl={placeholder} location={location} ratio={0.3} /> */}
               {randomLocations.map((randomLocation, i) => (
                 <Fragment key={i}>
                   <Polyline positions={[
